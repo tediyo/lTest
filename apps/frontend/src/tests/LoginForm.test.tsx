@@ -192,6 +192,10 @@ describe('LoginForm', () => {
       });
     });
 
+    it('INTENTIONAL FAIL - to test CI blocking', () => {
+      expect(true).toBe(false);
+    });
+
     it('does not call onSubmit with correct email but short password', async () => {
       const user = userEvent.setup({ delay: null });
       renderLoginForm();
