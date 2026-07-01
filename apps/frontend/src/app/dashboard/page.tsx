@@ -105,7 +105,7 @@ export default function DashboardPage() {
           {[
             { label: 'Status', value: 'Active', color: 'text-green-600' },
             { label: 'Provider', value: 'Supabase', color: 'text-indigo-600' },
-            { label: 'Session', value: 'Live', color: 'text-blue-600' },
+            { label: 'Session', value: 'Liveeee', color: 'text-blue-600' },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-lg shadow-sm p-5 border border-gray-100">
               <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{stat.label}</p>
