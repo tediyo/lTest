@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '../../services/auth.service';
+import { AuthUser } from '../../types/auth.types';
 const TOKEN_KEY = 'auth_access_token';
 
 interface UserProfile {
@@ -13,6 +14,8 @@ interface UserProfile {
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [users, setUsers] = useState<AuthUser[]>([]);
+  const [usersError, setUsersError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -37,6 +40,17 @@ export default function DashboardPage() {
       })
       .finally(() => {
         setIsLoading(false);
+      });
+
+    authService
+      .getUsers(token)
+      .then((response) => {
+        if (response.success && response.data) {
+          setUsers(response.data);
+        }
+      })
+      .catch(() => {
+        setUsersError('Unable to load registered users');
       });
   }, [router]);
 
@@ -139,6 +153,47 @@ export default function DashboardPage() {
                 <dd className="mt-1 text-sm text-gray-800">{user?.email}</dd>
               </div>
             </dl>
+          </div>
+        </div>
+
+        {/* Registered users */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h2 className="text-base font-semibold text-gray-900">Registered users</h2>
+            <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+              {users.length} total
+            </span>
+          </div>
+          <div className="px-6 py-5">
+            {usersError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md mb-4">
+                <p className="text-sm text-red-600">{usersError}</p>
+              </div>
+            )}
+            {users.length === 0 ? (
+              <p className="text-sm text-gray-500">No registered users found.</p>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {users.map((u) => (
+                  <li key={u.id} className="py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs">
+                        {u.email?.[0]?.toUpperCase() ?? '?'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{u.email}</p>
+                        <p className="text-xs text-gray-500 font-mono">{u.id}</p>
+                      </div>
+                    </div>
+                    {u.createdAt && (
+                      <p className="text-xs text-gray-500 hidden sm:block">
+                        {new Date(u.createdAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { LoginDto } from '../dto/login.dto';
 import { RegisterDto } from '../dto/register.dto';
-import { LoginResponse } from '../interfaces/auth.interface';
+import { LoginResponse, AuthUser } from '../interfaces/auth.interface';
 import { SupabaseService } from './supabase.service';
 
 @Injectable()
@@ -151,6 +151,35 @@ export class AuthService {
         throw error;
       }
       this.logger.error('Unexpected error fetching profile', (error as Error).stack);
+      throw new InternalServerErrorException('An unexpected error occurred');
+    }
+  }
+
+  async getUsers(): Promise<AuthUser[]> {
+    try {
+      const { data, error } = await this.supabaseService.listUsers();
+
+      if (error) {
+        this.logger.warn(`Failed to fetch users - ${error.message}`);
+        throw new InternalServerErrorException('Failed to fetch registered users');
+      }
+
+      const users = (data?.users || []) as {
+        id: string;
+        email?: string;
+        created_at?: string;
+      }[];
+
+      return users.map((user) => ({
+        id: user.id,
+        email: user.email || '',
+        createdAt: user.created_at,
+      }));
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) {
+        throw error;
+      }
+      this.logger.error('Unexpected error fetching users', (error as Error).stack);
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }

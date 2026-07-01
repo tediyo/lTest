@@ -10,6 +10,7 @@ const mockSupabaseService = {
   signUp: jest.fn(),
   signOut: jest.fn(),
   getUser: jest.fn(),
+  listUsers: jest.fn(),
 };
 
 describe('AuthService', () => {
@@ -141,6 +142,53 @@ describe('AuthService', () => {
       supabaseService.getUser.mockRejectedValue(new Error('Unexpected error'));
 
       await expect(service.getProfile('token')).rejects.toThrow(InternalServerErrorException);
+    });
+  });
+
+  describe('getUsers', () => {
+    it('should return a list of registered users', async () => {
+      const mockUsers = [
+        { id: 'user-1', email: 'a@example.com', created_at: '2024-01-01T00:00:00Z' },
+        { id: 'user-2', email: 'b@example.com', created_at: '2024-01-02T00:00:00Z' },
+      ];
+
+      supabaseService.listUsers.mockResolvedValue({
+        data: { users: mockUsers },
+        error: null,
+      });
+
+      const result = await service.getUsers();
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('user-1');
+      expect(result[0].email).toBe('a@example.com');
+      expect(result[0].createdAt).toBe('2024-01-01T00:00:00Z');
+    });
+
+    it('should return an empty array when no users are found', async () => {
+      supabaseService.listUsers.mockResolvedValue({
+        data: { users: [] },
+        error: null,
+      });
+
+      const result = await service.getUsers();
+
+      expect(result).toEqual([]);
+    });
+
+    it('should throw InternalServerErrorException when Supabase returns an error', async () => {
+      supabaseService.listUsers.mockResolvedValue({
+        data: null,
+        error: { message: 'Database error', status: 500 },
+      });
+
+      await expect(service.getUsers()).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should throw InternalServerErrorException on unexpected error', async () => {
+      supabaseService.listUsers.mockRejectedValue(new Error('Network error'));
+
+      await expect(service.getUsers()).rejects.toThrow(InternalServerErrorException);
     });
   });
 

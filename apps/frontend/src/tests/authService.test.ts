@@ -104,6 +104,33 @@ describe('authService', () => {
     });
   });
 
+  describe('getUsers', () => {
+    it('should return users list with Bearer token', async () => {
+      const mockUsers = {
+        success: true,
+        message: 'Users retrieved successfully',
+        data: [
+          { id: 'user-1', email: 'a@example.com' },
+          { id: 'user-2', email: 'b@example.com' },
+        ],
+      };
+
+      mock.onGet('/auth/users').reply(200, mockUsers);
+
+      const result = await authService.getUsers('valid-token');
+
+      expect(result.success).toBe(true);
+      expect(result.data).toHaveLength(2);
+      expect(mock.history.get[0].headers?.Authorization).toBe('Bearer valid-token');
+    });
+
+    it('should throw on 401 unauthorized', async () => {
+      mock.onGet('/auth/users').reply(401, { success: false, message: 'Unauthorized' });
+
+      await expect(authService.getUsers('bad-token')).rejects.toThrow();
+    });
+  });
+
   describe('getProfile', () => {
     it('should call profile endpoint with Bearer token', async () => {
       const mockProfile = {
