@@ -1,0 +1,25 @@
+{
+  "name": "auth-system",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "apps/backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "dev:backend": "npm run start:dev --workspace=apps/backend",
+    "build:frontend": "npm run build --workspace=apps/frontend",
+    "build:backend": "npm run build --workspace=apps/backend",
+    "test:frontend": "npm run test --workspace=apps/frontend",
+    "test:backend": "npm run test --workspace=apps/backend",
+    "test:coverage:frontend": "npm run test:coverage --workspace=apps/frontend",
+    "test:coverage:backend": "npm run test:cov --workspace=apps/backend",
+    "lint:frontend": "npm run lint --workspace=apps/frontend",
+    "lint:backend": "npm run lint --workspace=apps/backend"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
