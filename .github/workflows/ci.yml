@@ -10,9 +10,6 @@ jobs:
   backend:
     name: Backend — Lint, Type-check, Build & Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/backend
 
     steps:
       - name: Checkout repository
@@ -21,25 +18,28 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
-          cache-dependency-path: apps/backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: npm ci
 
       - name: Lint
+        working-directory: apps/backend
         run: npm run lint
 
       - name: Type-check
+        working-directory: apps/backend
         run: npx tsc --noEmit
 
       - name: Build
+        working-directory: apps/backend
         run: npm run build
 
       - name: Run tests with coverage
-        id: backend_tests
-        run: npm run test:cov -- --json --outputFile=test-results.json 2>&1 | tee test-output.txt; exit ${PIPESTATUS[0]}
+        working-directory: apps/backend
+        run: npm run test:cov -- --json --outputFile=../../test-results-backend.json
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://placeholder.supabase.co' }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
@@ -48,7 +48,7 @@ jobs:
 
       - name: Enforce minimum test count (backend)
         run: |
-          TOTAL=$(node -e "const r=require('./test-results.json'); console.log(r.numTotalTests)")
+          TOTAL=$(node -e "const r=require('./test-results-backend.json'); console.log(r.numTotalTests)")
           echo "Backend tests found: $TOTAL"
           if [ "$TOTAL" -lt 40 ]; then
             echo "❌ FAIL: Expected at least 40 backend tests, found $TOTAL"
@@ -59,10 +59,10 @@ jobs:
       - name: Post backend test summary
         if: always()
         run: |
-          TOTAL=$(node -e "const r=require('./test-results.json'); console.log(r.numTotalTests)" 2>/dev/null || echo "N/A")
-          PASSED=$(node -e "const r=require('./test-results.json'); console.log(r.numPassedTests)" 2>/dev/null || echo "N/A")
-          FAILED=$(node -e "const r=require('./test-results.json'); console.log(r.numFailedTests)" 2>/dev/null || echo "N/A")
-          SUITES=$(node -e "const r=require('./test-results.json'); console.log(r.numTotalTestSuites)" 2>/dev/null || echo "N/A")
+          TOTAL=$(node -e "const r=require('./test-results-backend.json'); console.log(r.numTotalTests)" 2>/dev/null || echo "N/A")
+          PASSED=$(node -e "const r=require('./test-results-backend.json'); console.log(r.numPassedTests)" 2>/dev/null || echo "N/A")
+          FAILED=$(node -e "const r=require('./test-results-backend.json'); console.log(r.numFailedTests)" 2>/dev/null || echo "N/A")
+          SUITES=$(node -e "const r=require('./test-results-backend.json'); console.log(r.numTotalTestSuites)" 2>/dev/null || echo "N/A")
           echo "## 🧪 Backend Test Results" >> $GITHUB_STEP_SUMMARY
           echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
@@ -77,13 +77,11 @@ jobs:
         with:
           name: backend-coverage
           path: apps/backend/coverage/
+          if-no-files-found: ignore
 
   frontend:
     name: Frontend — Lint, Type-check, Build & Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/frontend
 
     steps:
       - name: Checkout repository
@@ -92,33 +90,36 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
-          cache-dependency-path: apps/frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: npm ci
 
       - name: Lint
+        working-directory: apps/frontend
         run: npm run lint
 
       - name: Type-check
+        working-directory: apps/frontend
         run: npx tsc --noEmit
 
       - name: Build
+        working-directory: apps/frontend
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
 
       - name: Run tests with coverage
-        id: frontend_tests
-        run: npm run test:coverage -- --json --outputFile=test-results.json 2>&1 | tee test-output.txt; exit ${PIPESTATUS[0]}
+        working-directory: apps/frontend
+        run: npm run test:coverage -- --json --outputFile=../../test-results-frontend.json
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
 
       - name: Enforce minimum test count (frontend)
         run: |
-          TOTAL=$(node -e "const r=require('./test-results.json'); console.log(r.numTotalTests)")
+          TOTAL=$(node -e "const r=require('./test-results-frontend.json'); console.log(r.numTotalTests)")
           echo "Frontend tests found: $TOTAL"
           if [ "$TOTAL" -lt 50 ]; then
             echo "❌ FAIL: Expected at least 50 frontend tests, found $TOTAL"
@@ -129,10 +130,10 @@ jobs:
       - name: Post frontend test summary
         if: always()
         run: |
-          TOTAL=$(node -e "const r=require('./test-results.json'); console.log(r.numTotalTests)" 2>/dev/null || echo "N/A")
-          PASSED=$(node -e "const r=require('./test-results.json'); console.log(r.numPassedTests)" 2>/dev/null || echo "N/A")
-          FAILED=$(node -e "const r=require('./test-results.json'); console.log(r.numFailedTests)" 2>/dev/null || echo "N/A")
-          SUITES=$(node -e "const r=require('./test-results.json'); console.log(r.numTotalTestSuites)" 2>/dev/null || echo "N/A")
+          TOTAL=$(node -e "const r=require('./test-results-frontend.json'); console.log(r.numTotalTests)" 2>/dev/null || echo "N/A")
+          PASSED=$(node -e "const r=require('./test-results-frontend.json'); console.log(r.numPassedTests)" 2>/dev/null || echo "N/A")
+          FAILED=$(node -e "const r=require('./test-results-frontend.json'); console.log(r.numFailedTests)" 2>/dev/null || echo "N/A")
+          SUITES=$(node -e "const r=require('./test-results-frontend.json'); console.log(r.numTotalTestSuites)" 2>/dev/null || echo "N/A")
           echo "## 🧪 Frontend Test Results" >> $GITHUB_STEP_SUMMARY
           echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
@@ -147,6 +148,7 @@ jobs:
         with:
           name: frontend-coverage
           path: apps/frontend/coverage/
+          if-no-files-found: ignore
 
   all-checks-passed:
     name: All Checks Passed
