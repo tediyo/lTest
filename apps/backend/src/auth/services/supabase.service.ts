@@ -54,9 +54,4 @@ export class SupabaseService {
   async getUser(accessToken: string): Promise<{ data: { user: unknown } | null; error: AuthError | null }> {
     return this.anonClient.auth.getUser(accessToken);
   }
-
-  async listUsers(): Promise<{ data: { users: unknown[] } | null; error: AuthError | null }> {
-    this.logger.log('Fetching registered users list');
-    return this.adminClient.auth.admin.listUsers();
-  }
 }

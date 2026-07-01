@@ -60,11 +60,4 @@ export class AuthController {
   ): Promise<ApiResponse<AuthUser>> {
     return successResponse('Profile retrieved successfully', req.user);
   }
-
-  @Get('users')
-  @UseGuards(JwtAuthGuard)
-  async getUsers(): Promise<ApiResponse<AuthUser[]>> {
-    const users = await this.authService.getUsers();
-    return successResponse('Users retrieved successfully', users);
-  }
 }

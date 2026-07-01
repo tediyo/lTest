@@ -12,7 +12,6 @@ const mockAuthService = {
   register: jest.fn(),
   logout: jest.fn(),
   getProfile: jest.fn(),
-  getUsers: jest.fn(),
 };
 
 const mockJwtAuthGuard = {
@@ -113,23 +112,6 @@ describe('AuthController', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockUser);
-    });
-  });
-
-  describe('getUsers', () => {
-    it('should return success response with users list', async () => {
-      const users = [
-        { id: 'user-1', email: 'a@example.com' },
-        { id: 'user-2', email: 'b@example.com' },
-      ];
-      authService.getUsers.mockResolvedValue(users);
-
-      const result = await controller.getUsers();
-
-      expect(result.success).toBe(true);
-      expect(result.message).toBe('Users retrieved successfully');
-      expect(result.data).toEqual(users);
-      expect(authService.getUsers).toHaveBeenCalled();
     });
   });
 

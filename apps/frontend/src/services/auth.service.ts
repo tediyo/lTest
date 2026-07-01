@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiResponse, AuthUser, LoginFormData, LoginResponseData, RegisterFormData } from '../types/auth.types';
+import { ApiResponse, LoginFormData, LoginResponseData, RegisterFormData } from '../types/auth.types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -35,13 +35,6 @@ export const authService = {
 
   async getProfile(accessToken: string): Promise<ApiResponse> {
     const response = await authApi.get<ApiResponse>('/auth/profile', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    return response.data;
-  },
-
-  async getUsers(accessToken: string): Promise<ApiResponse<AuthUser[]>> {
-    const response = await authApi.get<ApiResponse<AuthUser[]>>('/auth/users', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     return response.data;
