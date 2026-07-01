@@ -104,7 +104,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { label: 'Status', value: 'Active', color: 'text-green-600' },
-            { label: 'Provider', value: 'Supabase', color: 'text-indigo-600' },
+            { label: 'Provider', value: 'Supabase ', color: 'text-indigo-600' },
             { label: 'Session', value: 'Live', color: 'text-blue-600' },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-lg shadow-sm p-5 border border-gray-100">
