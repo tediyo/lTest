@@ -152,19 +152,43 @@ describe('LoginForm', () => {
     });
 
     it('shows error message when wrong password is provided', async () => {
-      mockOnSubmit.mockImplementation(() => Promise.reject(new Error('Invalid email or password')));
+      mockOnSubmit.mockResolvedValue(undefined);
       const user = userEvent.setup({ delay: null });
-      renderLoginForm({ error: 'Invalid email or password' });
+      const { rerender } = renderLoginForm();
 
       await user.type(screen.getByLabelText(/email address/i), 'admin@example.com');
       await user.type(screen.getByLabelText(/password/i), 'wrongpassword');
+      await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+      await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
+        { email: 'admin@example.com', password: 'wrongpassword' },
+        expect.anything(),
+      ));
+
+      rerender(
+        <LoginForm onSubmit={mockOnSubmit} isLoading={false} error="Invalid email or password" />,
+      );
 
       expect(screen.getByRole('alert')).toHaveTextContent('Invalid email or password');
     });
 
     it('shows error message when wrong email is provided', async () => {
-      mockOnSubmit.mockImplementation(() => Promise.reject(new Error('Invalid email or password')));
-      renderLoginForm({ error: 'Invalid email or password' });
+      mockOnSubmit.mockResolvedValue(undefined);
+      const user = userEvent.setup({ delay: null });
+      const { rerender } = renderLoginForm();
+
+      await user.type(screen.getByLabelText(/email address/i), 'wrong@example.com');
+      await user.type(screen.getByLabelText(/password/i), 'somepassword');
+      await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+      await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
+        { email: 'wrong@example.com', password: 'somepassword' },
+        expect.anything(),
+      ));
+
+      rerender(
+        <LoginForm onSubmit={mockOnSubmit} isLoading={false} error="Invalid email or password" />,
+      );
 
       expect(screen.getByRole('alert')).toHaveTextContent('Invalid email or password');
       expect(screen.queryByRole('button', { name: /sign in/i })).not.toBeDisabled();
@@ -172,9 +196,23 @@ describe('LoginForm', () => {
 
     it('displays API error when onSubmit prop receives an error string', async () => {
       mockOnSubmit.mockResolvedValue(undefined);
-      renderLoginForm({ error: 'Invalid email or password' });
+      const user = userEvent.setup({ delay: null });
+      const { rerender } = renderLoginForm();
 
-      expect(screen.getByRole('alert')).toHaveTextContent('Invalid email or password');
+      await user.type(screen.getByLabelText(/email address/i), 'user@example.com');
+      await user.type(screen.getByLabelText(/password/i), 'validpassword');
+      await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+      await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
+        { email: 'user@example.com', password: 'validpassword' },
+        expect.anything(),
+      ));
+
+      rerender(
+        <LoginForm onSubmit={mockOnSubmit} isLoading={false} error="Service unavailable" />,
+      );
+
+      expect(screen.getByRole('alert')).toHaveTextContent('Service unavailable');
       expect(screen.queryByRole('button', { name: /sign in/i })).not.toBeDisabled();
     });
 
