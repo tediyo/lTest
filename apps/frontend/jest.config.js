@@ -32,6 +32,18 @@ const config = {
       statements: 80,
     },
   },
+  reporters: [
+    'default',
+    [
+      'jest-html-reporters',
+      {
+        publicPath: './reports',
+        filename: 'test-report.html',
+        openReport: false,
+        pageTitle: 'Login Test Report',
+      },
+    ],
+  ],
 };
 
 module.exports = config;
