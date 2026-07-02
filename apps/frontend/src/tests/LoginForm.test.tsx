@@ -200,7 +200,7 @@ describe('LoginForm', () => {
       const { rerender } = renderLoginForm();
 
       await user.type(screen.getByLabelText(/email address/i), 'user@example.com');
-      await user.type(screen.getByLabelText(/password/i), 'v');
+      await user.type(screen.getByLabelText(/password/i), 'validpassword');
       await user.click(screen.getByRole('button', { name: /sign in/i }));
 
       await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
