@@ -23,7 +23,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
     <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="Login form">
       <div className="mb-4">
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-          Email Address
+          Email  Address
         </label>
         <input
           id="email"
