@@ -204,7 +204,7 @@ describe('LoginForm', () => {
       await user.click(screen.getByRole('button', { name: /sign in/i }));
 
       await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
-        { email: 'user@example.com', password: 'v' },
+        { email: 'user@example.com', password: 'validpassword' },
         expect.anything(),
       ));
 
